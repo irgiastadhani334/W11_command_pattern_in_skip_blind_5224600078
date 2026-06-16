@@ -10,6 +10,13 @@
    ## d. Apa masalah yang muncul jika semua reward dibuat menggunakan if-else besar?
     Apabila penerapan skip reward menggunakan satu blok if-else besar maka kita akan menghadapi masalah teknis dimana penerapan skip reward melanggar single responsibility principle karena class if-else tersebut berada akan memikul banyak load karena harus mengetahui detail cara kerja semua jenis skip reward yang berbeda,
 
-#Analisis Responsibility dari setiap class
-
-   
+# Analisis Responsibility dari setiap class
+| Responsibility | Class | Peran dalam sistem |
+| --- | --- | --- |
+|Membuat reward|RewardFactory|Bertindak sebagai pembuat objek command. Kelas lain tidak perlu tahu bagaimana cara membuat objek FreeJokerCommand atau DoubleMoneyCommand, cukup meminta ke Factory menggunakan TagType.|
+|Menyimpan reward|RewardCommandManager|Berfungsi sebagai wadah container untuk semua reward command yang sedang aktif dan belum terpicu di dalam std::vector|
+|Mengecek trigger|RewardCommandManager|Memantau siklus game loop (event pemicu). Ketika sebuah aksi terjadi (seperti EnterShop atau EnterBlind), kelas ini mencocokkannya dengan trigger yang dimiliki setiap command|
+|Mengeksekusi reward|ICommand / ConcreteCommand|Menjalankan logika atau efek mekanik game yang spesifik (misal: memotong harga joker atau menggandakan uang) tepat ketika fungsi .execute() dipanggil|
+|Menghapus reward|RewardCommandManager|Melakukan manajemen memori (cleanup) secara otomatis untuk menghapus dan membuang objek command dari antrean setelah efeknya selesai dieksekusi|
+|Menetapkan kontrak standar (behavior) untuk semua reward|ICommand|Memastikan bahwa RewardCommandManager dapat berinteraksi dengan seluruh reward yang ada di game tanpa harus mengetahui detail isi dari reward tersebut|
+|Enkapsulasi logika mekanik reward yang spesifik dan mengetahui kapan event trigger-nya sendiri|FreeJokerCommand, DoubleMoneyCommand, MegaBlindBuffCommand|Memisahkan setiap reward ke dalam kelasnya masing-masing membuat kode memenuhi Single Responsibility Principle (SRP). Jika efek DoubleMoneyCommand ingin diubah fungsinya di kemudian hari, kita hanya perlu mengedit kelas tersebut tanpa berisiko merusak logika reward lainnya.|
